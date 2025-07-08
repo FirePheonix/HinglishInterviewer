@@ -33,6 +33,13 @@ const Agent = ({ userName, userId, type }: AgentProps) => {
             if(message.type === 'transcript' && message.transcriptType === 'final') {
                 const newMessage = { role: message.role, content: message.transcript }
 
+                // Console log the transcription
+                console.log('Transcription:', {
+                    role: message.role,
+                    transcript: message.transcript,
+                    timestamp: new Date().toISOString()
+                });
+
                 setMessages((prev) => [...prev, newMessage]);
             }
         }
