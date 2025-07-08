@@ -1,4 +1,4 @@
-import { mappings } from "@/constants";
+import { interviewCovers, mappings } from "@/constants";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -32,17 +32,36 @@ export const getTechLogos = async (techArray: string[]) => {
   });
 
   const results = await Promise.all(
-      logoURLs.map(async ({ tech, url }) => ({
-        tech,
-        url: (await checkIconExists(url)) ? url : "/tech.svg",
-      }))
+    logoURLs.map(async ({ tech, url }) => ({
+      tech,
+      url: (await checkIconExists(url)) ? url : "/tech.svg",
+    }))
   );
 
   return results;
 };
 
-// getRandomInterviewCover function is no longer used - replaced with standard SVG icons
-// export const getRandomInterviewCover = () => {
-//   const randomIndex = Math.floor(Math.random() * interviewCovers.length);
-//   return `/covers${interviewCovers[randomIndex]}`;
-// };
+export const getTechLogosSync = (techArray: string[]) => {
+  const logoURLs = techArray.map((tech) => {
+    const normalized = normalizeTechName(tech);
+    return {
+      tech,
+      url: `${techIconBaseURL}/${normalized}/${normalized}-original.svg`,
+    };
+  });
+
+  return logoURLs;
+};
+
+export const getRandomInterviewCover = () => {
+  // Use available images as fallbacks
+  const availableImages = [
+    "/ai-avatar.png",
+    "/robot.png",
+    "/user-avatar.png",
+    "/pattern.png"
+  ];
+  
+  const randomIndex = Math.floor(Math.random() * availableImages.length);
+  return availableImages[randomIndex];
+};

@@ -1,17 +1,17 @@
-import { ReactNode } from 'react'
-import {isAuthenticated} from "@/lib/actions/auth.action";
-import {redirect} from "next/navigation";
+import { ReactNode } from "react";
+import { isAuthenticated } from "@/lib/actions/auth.action";
+import { redirect } from "next/navigation";
 
-const AuthLayout = async ({ children }: { children: ReactNode  }) => {
-    const isUserAuthenticated = await isAuthenticated();
+const AuthLayout = async ({ children }: { children: ReactNode }) => {
+  const isUserAuthenticated = await isAuthenticated();
 
-    if(isUserAuthenticated) redirect('/');
+  if (isUserAuthenticated) redirect("/");
 
-    return (
-        <div className="flex items-center justify-center mx-auto max-w-7xl min-h-screen bg-black text-white px-4 py-8">
-            {children}
-        </div>
-    )
-}
+  return (
+    <div className="flex items-center justify-center mx-auto max-w-7xl min-h-screen bg-black text-white px-4 py-8">
+      {children}
+    </div>
+  );
+};
 
-export default AuthLayout
+export default AuthLayout;

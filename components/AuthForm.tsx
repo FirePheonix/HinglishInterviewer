@@ -1,147 +1,203 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-
-import { Button } from "@/components/ui/button"
-import { Form} from "@/components/ui/form"
-import Image from "next/image";
+import { z } from "zod";
 import Link from "next/link";
-import {toast} from "sonner";
-import FormField from "@/components/FormField";
-import {useRouter} from "next/navigation";
-import {createUserWithEmailAndPassword, signInWithEmailAndPassword} from "firebase/auth";
-import {auth} from "@/firebase/client";
-import {signIn, signUp} from "@/lib/actions/auth.action";
+import { toast } from "sonner";
+import { auth } from "@/firebase/client";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+
+import { signIn, signUp } from "@/lib/actions/auth.action";
 
 const authFormSchema = (type: FormType) => {
-    return z.object({
-        name: type === 'sign-up' ? z.string().min(3) : z.string().optional(),
-        email: z.string().email(),
-        password: z.string().min(3),
-    })
-}
+  return z.object({
+    name: type === "sign-up" ? z.string().min(3) : z.string().optional(),
+    email: z.string().email(),
+    password: z.string().min(3),
+  });
+};
 
 const AuthForm = ({ type }: { type: FormType }) => {
-    const router = useRouter();
-    const formSchema = authFormSchema(type);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: "",
-            email: "",
-            password: "",
-        },
-    })
+  const formSchema = authFormSchema(type);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  });
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        try {
-            if(type === 'sign-up') {
-                const { name, email, password } = values;
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    try {
+      if (type === "sign-up") {
+        const { name, email, password } = data;
 
-                const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
 
-                const result = await signUp({
-                    uid: userCredentials.user.uid,
-                    name: name!,
-                    email,
-                    password,
-                })
+        const result = await signUp({
+          uid: userCredential.user.uid,
+          name: name!,
+          email,
+          password,
+        });
 
-                if(!result?.success) {
-                    toast.error(result?.message);
-                    return;
-                }
-
-                toast.success('Account created successfully. Please sign in.');
-                router.push('/sign-in')
-            } else {
-                const { email, password } = values;
-
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-
-                const idToken = await userCredential.user.getIdToken();
-
-                if(!idToken) {
-                    toast.error('Sign in failed')
-                    return;
-                }
-
-                await signIn({
-                    email, idToken
-                })
-
-                toast.success('Sign in successfully.');
-                router.push('/')
-            }
-        } catch (error) {
-            console.log(error);
-            toast.error(`There was an error: ${error}`)
+        if (!result.success) {
+          toast.error(result.message);
+          return;
         }
+
+        toast.success("Account created successfully. Please sign in.");
+        router.push("/sign-in");
+      } else {
+        const { email, password } = data;
+
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+        const idToken = await userCredential.user.getIdToken();
+        if (!idToken) {
+          toast.error("Sign in Failed. Please try again.");
+          return;
+        }
+
+        await signIn({
+          email,
+          idToken,
+        });
+
+        toast.success("Signed in successfully.");
+        router.push("/");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(`There was an error: ${error}`);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    const isSignIn = type === 'sign-in';
+  const isSignIn = type === "sign-in";
 
-    return (
-        <div className="w-full max-w-md mx-auto bg-black border border-gray-800 rounded-2xl p-0.5">
-            <div className="flex flex-col gap-6 bg-black rounded-2xl py-14 px-10">
-                <div className="flex flex-row gap-2 justify-center items-center">
-                    <Image
-                        src="/logo.svg"
-                        alt="logo"
-                        height={32}
-                        width={38}
-                    />
-                    <h2 className="text-white text-2xl font-semibold">Interviewलो</h2>
-                </div>
-
-                <h3 className="text-white text-xl font-semibold text-center">Practice job interview with AI</h3>
-
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6 mt-4">
-                        {!isSignIn && (
-                            <FormField
-                                control={form.control}
-                                name="name"
-                                label="Name"
-                                placeholder="Your Name"
-                            />
-                        )}
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            label="Email"
-                            placeholder="Your email address"
-                            type="email"
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            label="Password"
-                            placeholder="Enter your password"
-                            type="password"
-                        />
-
-                        <Button 
-                            className="w-full bg-white text-black hover:bg-gray-200 rounded-full min-h-12 font-bold px-5 cursor-pointer" 
-                            type="submit"
-                        >
-                            {isSignIn ? 'Sign in' : 'Create an Account'}
-                        </Button>
-                    </form>
-                </Form>
-                
-                <p className="text-center text-white">
-                    {isSignIn ? 'No account yet?' : 'Have an account already?'}
-                    <Link href={!isSignIn ? '/sign-in' : '/sign-up'} className="font-bold text-blue-400 ml-1 hover:text-blue-300">
-                        {!isSignIn ? "Sign in" : 'Sign up'}
-                    </Link>
-                </p>
+  return (
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo and Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center">
+              <span className="text-black font-bold text-lg">P</span>
             </div>
+            <h1 className="text-white text-2xl font-light tracking-wide">
+              Interviewलो
+            </h1>
+          </div>
+          <p className="text-gray-400 text-sm">
+            Practice job interviews with AI
+          </p>
         </div>
-    )
-}
-export default AuthForm
+
+        {/* Form */}
+        <div className="space-y-6">
+          {!isSignIn && (
+            <div>
+              <label className="block text-white text-sm font-medium mb-2">
+                Name
+              </label>
+              <input
+                {...register("name")}
+                type="text"
+                placeholder="Your Name"
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-colors"
+              />
+              {errors.name && (
+                <p className="text-red-400 text-xs mt-1">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-white text-sm font-medium mb-2">
+              Email
+            </label>
+            <input
+              {...register("email")}
+              type="email"
+              placeholder="Your email address"
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-colors"
+            />
+            {errors.email && (
+              <p className="text-red-400 text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-white text-sm font-medium mb-2">
+              Password
+            </label>
+            <input
+              {...register("password")}
+              type="password"
+              placeholder="Enter your password"
+              className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-colors"
+            />
+            {errors.password && (
+              <p className="text-red-400 text-xs mt-1">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          <button
+            onClick={handleSubmit(onSubmit)}
+            disabled={isLoading}
+            className="w-full py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Loading..." : isSignIn ? "Sign In" : "Create Account"}
+          </button>
+        </div>
+
+        {/* Footer Link */}
+        <div className="text-center mt-8">
+          <p className="text-gray-400 text-sm">
+            {isSignIn ? "No account yet?" : "Have an account already?"}
+            <Link
+              href={!isSignIn ? "/sign-in" : "/sign-up"}
+              className="text-white font-medium ml-2 hover:underline transition-colors"
+            >
+              {!isSignIn ? "Sign In" : "Sign Up"}
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AuthForm;

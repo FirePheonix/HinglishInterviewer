@@ -18,8 +18,8 @@
   --color-light-600: #4f557d;
   --color-light-800: #24273a;
 
-  --color-dark-100: #020408;
-  --color-dark-200: #27282f;
+  --color-dark-100: #000000;
+  --color-dark-200: #1a1a1a;
   --color-dark-300: #242633;
 
   --font-mona-sans: "Mona Sans", sans-serif;
@@ -138,17 +138,25 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    @apply bg-black text-white;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-black text-white min-h-screen;
   }
   p {
     @apply text-light-100;
   }
+  h1 {
+    @apply text-white;
+  }
   h2 {
-    @apply text-3xl font-semibold;
+    @apply text-3xl font-semibold text-white;
   }
   h3 {
-    @apply text-2xl font-semibold;
+    @apply text-2xl font-semibold text-white;
   }
   ul {
     @apply list-disc list-inside;
@@ -258,12 +266,11 @@
   }
 
   .auth-layout {
-    @apply flex items-center justify-center mx-auto max-w-7xl min-h-screen max-sm:px-4 max-sm:py-8;
+    @apply flex items-center justify-center mx-auto max-w-7xl min-h-screen max-sm:px-4 max-sm:py-8 bg-black text-white;
   }
 
   .root-layout {
-    @apply flex mx-auto max-w-7xl flex-col gap-12 my-12 px-16 max-sm:px-4 max-sm:my-8;
-    background-color: #000000 !important;
+    @apply flex mx-auto max-w-7xl flex-col gap-12 my-12 px-16 max-sm:px-4 max-sm:my-8 bg-black text-white min-h-screen;
   }
 
   .card-cta {
@@ -293,28 +300,6 @@
       @apply text-sm font-semibold capitalize;
     }
   }
-}
-
-/* Custom pitch black background */
-html, body {
-  background-color: #000000 !important;
-  color: #ffffff !important;
-}
-
-/* Ensure dark theme variables are properly applied */
-:root {
-  --dark-bg: #000000;
-  --dark-text: #ffffff;
-  --dark-card: #1a1a1a;
-}
-
-/* Override any light backgrounds */
-.bg-background {
-  background-color: #000000 !important;
-}
-
-.text-foreground {
-  color: #ffffff !important;
 }
 
 @utility dark-gradient {
@@ -354,4 +339,283 @@ html, body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Interview-specific styles - Pitch Black Theme */
+.interview-page {
+  background-color: #000000 !important;
+  color: white !important;
+  min-height: 100vh;
+}
+
+.interview-page h1,
+.interview-page h2,
+.interview-page h3,
+.interview-page h4,
+.interview-page h5,
+.interview-page h6 {
+  color: white !important;
+}
+
+.interview-page p {
+  color: white !important;
+}
+
+.interview-page .card-interviewer {
+  background-color: #000000 !important;
+  border: 1px solid white !important;
+}
+
+.interview-page .card-border {
+  background-color: #000000 !important;
+  border: 1px solid white !important;
+}
+
+.interview-page .card-content {
+  background-color: #000000 !important;
+}
+
+.interview-page .avatar {
+  background-color: #000000 !important;
+  border: 1px solid white !important;
+}
+
+.interview-page .transcript-border {
+  background-color: #000000 !important;
+  border: 1px solid white !important;
+}
+
+.interview-page .transcript {
+  background-color: #000000 !important;
+}
+
+/* Interview dialog styles */
+.interview-dialog {
+  background-color: #000000 !important;
+  border: 1px solid white !important;
+  color: white !important;
+}
+
+.interview-dialog label {
+  color: white !important;
+}
+
+.interview-dialog select,
+.interview-dialog input {
+  background-color: #000000 !important;
+  color: white !important;
+  border: 1px solid white !important;
+}
+
+.interview-dialog button {
+  border: 1px solid white !important;
+}
+
+.interview-dialog button[type="submit"] {
+  background-color: white !important;
+  color: black !important;
+}
+
+.interview-dialog button[type="button"] {
+  background-color: #000000 !important;
+  color: white !important;
+}
+.call-view {
+  background-color: black;
+  min-height: 100vh;
+  color: white;
+  display: flex;
+  gap: 2.5rem;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (max-width: 640px) {
+  .call-view {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 641px) {
+  .call-view {
+    flex-direction: row;
+  }
+}
+
+.card-interviewer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.75rem;
+  height: 400px;
+  background-color: black;
+  border: 1px solid rgb(31, 41, 55);
+  border-radius: 0.5rem;
+  flex: 1;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 641px) {
+  .card-interviewer {
+    flex-basis: 50%;
+  }
+}
+
+.card-border {
+  flex: 1;
+  height: 400px;
+  background-color: black;
+  border: 1px solid rgb(31, 41, 55);
+  border-radius: 0.5rem;
+  padding: 1.75rem;
+  width: 100%;
+}
+
+@media (min-width: 641px) {
+  .card-border {
+    flex-basis: 50%;
+  }
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.avatar {
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(17, 24, 39);
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  position: relative;
+  border: 1px solid rgb(55, 65, 81);
+}
+
+.animate-speak {
+  position: absolute;
+  display: inline-flex;
+  width: 83.333333%;
+  height: 83.333333%;
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+  border-radius: 50%;
+  background-color: white;
+  opacity: 0.75;
+}
+
+.transcript-border {
+  width: 100%;
+  background-color: black;
+  border: 1px solid rgb(31, 41, 55);
+  border-radius: 1rem;
+  padding: 0.125rem;
+  margin-top: 2rem;
+  max-width: 56rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.transcript {
+  background-color: black;
+  border-radius: 1rem;
+  min-height: 3rem;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-call {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  font-weight: bold;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  color: black;
+  transition: background-color 0.15s ease-in-out;
+  background-color: white;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  min-width: 7rem;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.btn-call:hover {
+  background-color: rgb(229, 231, 235);
+}
+
+.btn-call:active {
+  background-color: rgb(229, 231, 235);
+}
+
+.btn-call:focus {
+  outline: none;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.btn-disconnect {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  line-height: 1.25;
+  color: white;
+  transition: background-color 0.15s ease-in-out;
+  background-color: rgb(220, 38, 38);
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  min-width: 7rem;
+}
+
+.btn-disconnect:hover {
+  background-color: rgb(185, 28, 28);
+}
+
+.btn-disconnect:active {
+  background-color: rgb(185, 28, 28);
+}
+
+.btn-disconnect:focus {
+  outline: none;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.card-interviewer h3,
+.card-content h3 {
+  text-align: center;
+  color: white;
+  margin-top: 1.25rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.transcript p {
+  transition: opacity 0.5s ease-in-out;
+  opacity: 0;
+  font-size: 1.125rem;
+  text-align: center;
+  color: white;
+  animation: fadeIn 0.3s ease-in-out;
+  opacity: 1;
 }

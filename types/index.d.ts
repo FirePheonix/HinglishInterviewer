@@ -39,12 +39,17 @@ interface User {
 }
 
 interface InterviewCardProps {
-  interviewId?: string;
+  interviewId: string;
   userId?: string;
   role: string;
   type: string;
   techstack: string[];
   createdAt?: string;
+  feedback?: {
+    totalScore: number;
+    finalAssessment: string;
+    createdAt: string;
+  } | null;
 }
 
 interface AgentProps {
@@ -54,6 +59,9 @@ interface AgentProps {
   feedbackId?: string;
   type: "generate" | "interview";
   questions?: string[];
+  phoneNumber?: string;
+  profileImage?: string;
+  mode?: "assistant" | "workflow";
 }
 
 interface RouteParams {
