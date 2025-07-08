@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import InterviewCard from "@/components/InterviewCard";
+import ResumeAnalyzer from "@/components/ResumeAnalyzer";
 import { Brain, Mic, BarChart3 } from "lucide-react";
 
 interface PageProps {
@@ -132,6 +133,29 @@ const Page: React.FC<PageProps> = ({
             </p>
           )}
         </div>
+      </section>
+
+      {/* Resume Analyzer Section */}
+      <section className="mt-16">
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mb-8"
+        >
+          <h2 className="text-white text-2xl font-semibold mb-4">Resume Analyzer</h2>
+          <p className="text-light-100">
+            Upload your resume and get comprehensive analysis with personalized recommendations
+          </p>
+        </motion.div>
+        
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.8 }}
+        >
+          <ResumeAnalyzer />
+        </motion.div>
       </section>
     </div>
   );
