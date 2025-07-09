@@ -16,7 +16,6 @@ import { cn } from "@/lib/utils";
 import { DotPattern } from "@/components/magicui/dot-pattern";
 import { GridPattern } from "@/components/magicui/grid-pattern";
 
-// Reusable Components
 const HowItWorksCard = ({ stepNumber, title, description, delay, icon, hoverColor }: {
   stepNumber: string;
   title: string;
@@ -232,6 +231,7 @@ const ProductBannerInView = ({ src, alt, href, buttonText, delay, hoverColor }: 
       case 'blue': return 2;
       case 'purple': return -2;
       case 'green': return 1;
+      case 'orange': return -1;
       default: return 0;
     }
   };
@@ -241,6 +241,7 @@ const ProductBannerInView = ({ src, alt, href, buttonText, delay, hoverColor }: 
       case 'blue': return 'group-hover:border-blue-400';
       case 'purple': return 'group-hover:border-purple-400';
       case 'green': return 'group-hover:border-green-400';
+      case 'orange': return 'group-hover:border-orange-400';
       default: return 'group-hover:border-gray-400';
     }
   };
@@ -250,6 +251,7 @@ const ProductBannerInView = ({ src, alt, href, buttonText, delay, hoverColor }: 
       case 'blue': return 'hover:bg-blue-400';
       case 'purple': return 'hover:bg-purple-400';
       case 'green': return 'hover:bg-green-400';
+      case 'orange': return 'hover:bg-orange-400';
       default: return 'hover:bg-gray-400';
     }
   };
@@ -773,18 +775,23 @@ const Page: React.FC<PageProps> = ({
               hoverColor="purple"
             />
 
-            <div className="md:col-span-2 flex justify-center">
-              <div className="w-full md:w-1/2">
-                <ProductBannerInView
-                  src="/ConsultLoBanner.png"
-                  alt="Consultलो - AI Consultation Platform"
-                  href="https://consultlo.netlify.app/"
-                  buttonText="Try Now"
-                  delay={0.6}
-                  hoverColor="green"
-                />
-              </div>
-            </div>
+            <ProductBannerInView
+              src="/ConsultLoBanner.png"
+              alt="Consultलो - AI Consultation Platform"
+              href="https://consultlo.netlify.app/"
+              buttonText="Try Now"
+              delay={0.6}
+              hoverColor="green"
+            />
+
+            <ProductBannerInView
+              src="/JobLoBanner.png"
+              alt="Jobलो - AI Job Search Platform"
+              href="https://job-lo.vercel.app"
+              buttonText="Try Now"
+              delay={0.8}
+              hoverColor="orange"
+            />
           </div>
         </div>
       </section>
