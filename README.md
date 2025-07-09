@@ -5,7 +5,7 @@ https://hinglish-interviewer.vercel.app
 
 ## Job Finder: 
 Github: https://github.com/FirePheonix/JobLo
-Deployed Link: ttps://job-lo.vercel.app
+Deployed Link: https://job-lo.vercel.app
 ## Roadmap Maker: 
 Github: https://github.com/FirePheonix/GuidanceLo
 Deployed Link: https://guidance-lo.vercel.app
