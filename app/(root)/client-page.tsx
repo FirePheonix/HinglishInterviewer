@@ -570,6 +570,83 @@ const Page: React.FC<PageProps> = ({
         </div>
       </section>
 
+      {/* Our Products Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-5xl font-bold text-white mb-4">Our Products</h2>
+            <p className="text-gray-400 text-xl max-w-2xl mx-auto">
+              Discover our suite of AI-powered tools designed to accelerate your coding journey
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* NotesLo Banner */}
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="relative group cursor-pointer"
+            >
+              <div className="relative overflow-hidden rounded-xl border border-white bg-black h-[400px]">
+                <img 
+                  src="/NotesLoBanner.png" 
+                  alt="Notesलो - AI Coding Notetaker" 
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300"></div>
+                
+                {/* Try Now Button Overlay */}
+                <div className="absolute bottom-8 right-8">
+                  <Button
+                    asChild
+                    className="bg-white text-black hover:bg-gray-200 font-semibold px-8 py-3 rounded-full shadow-lg transition-all duration-300 group-hover:scale-110"
+                  >
+                    <a href="https://notes.lo" target="_blank" rel="noopener noreferrer">
+                      Try Now
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* GuidanceLo Banner */}
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="relative group cursor-pointer"
+            >
+              <div className="relative overflow-hidden rounded-xl border border-white bg-black h-[400px]">
+                <img 
+                  src="/GuidanceLoBanner.png" 
+                  alt="Guidanceलो - Visual Roadmap Maker" 
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300"></div>
+                
+                {/* Try Now Button Overlay */}
+                <div className="absolute bottom-8 right-8">
+                  <Button
+                    asChild
+                    className="bg-white text-black hover:bg-gray-200 font-semibold px-8 py-3 rounded-full shadow-lg transition-all duration-300 group-hover:scale-110"
+                  >
+                    <a href="https://guidance.lo" target="_blank" rel="noopener noreferrer">
+                      Try Now
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Create Interview Button */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
