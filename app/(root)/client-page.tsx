@@ -1,15 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import InterviewCard from "@/components/InterviewCard";
+import CategoryCard from "@/components/CategoryCard";
 import ResumeAnalyzer from "@/components/ResumeAnalyzer";
 import DSALearningPath from "@/components/DSALearningPath";
 import DevelopmentLearningPath from "@/components/DevelopmentLearningPath";
 import MLPythonLearningPath from "@/components/MLPythonLearningPath";
 import { Brain, Mic, BarChart3 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { DotPattern } from "@/components/magicui/dot-pattern";
+import { GridPattern } from "@/components/magicui/grid-pattern";
 
 interface PageProps {
   userInterviews?: (any & { feedback?: any })[];
@@ -31,8 +36,14 @@ const Page: React.FC<PageProps> = ({
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative flex items-center justify-center min-h-[90vh] mb-16"
+        className="relative flex items-center justify-center min-h-[90vh] mb-16 overflow-hidden"
       >
+        {/* Dot Pattern Background */}
+        <DotPattern
+          className={cn(
+            "absolute inset-0 [mask-image:radial-gradient(400px_circle_at_center,white,transparent)]",
+          )}
+        />
         {/* Left Phone Mockup */}
         <motion.div
           initial={{ x: -50, opacity: 0 }}
@@ -257,6 +268,308 @@ const Page: React.FC<PageProps> = ({
         `}</style>
       </motion.div>
 
+      {/* How It Works Section */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.8 }}
+        className="py-20 px-4"
+      >
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-white mb-4">How It Works</h2>
+            <p className="text-gray-400 text-xl max-w-2xl mx-auto">
+              Get interview-ready in just 3 simple steps with our AI-powered platform
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Step 1 */}
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 1.0 }}
+              className="text-center p-8 border border-white rounded-xl bg-black"
+            >
+              <div className="relative mb-8">
+                <div className="w-24 h-24 bg-black border-2 border-white rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="text-3xl font-bold text-white">1</div>
+                </div>
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 border-2 border-gray-700 rounded-full opacity-20"></div>
+              </div>
+              <h3 className="text-2xl font-semibold text-white mb-4">Choose Your Role</h3>
+              <p className="text-gray-400 text-lg">
+                Select your target position and skill level. Our AI will customize questions specifically for your career goals.
+              </p>
+            </motion.div>
+
+            {/* Step 2 */}
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 1.2 }}
+              className="text-center p-8 border border-white rounded-xl bg-black"
+            >
+              <div className="relative mb-8">
+                <div className="w-24 h-24 bg-black border-2 border-white rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Mic className="w-10 h-10 text-white" />
+                </div>
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 border-2 border-gray-700 rounded-full opacity-20"></div>
+              </div>
+              <h3 className="text-2xl font-semibold text-white mb-4">Practice Live</h3>
+              <p className="text-gray-400 text-lg">
+                Engage in real-time conversations with our AI interviewer. Experience realistic interview scenarios with voice interaction.
+              </p>
+            </motion.div>
+
+            {/* Step 3 */}
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 1.4 }}
+              className="text-center p-8 border border-white rounded-xl bg-black"
+            >
+              <div className="relative mb-8">
+                <div className="w-24 h-24 bg-black border-2 border-white rounded-full flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="w-10 h-10 text-white" />
+                </div>
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-32 border-2 border-gray-700 rounded-full opacity-20"></div>
+              </div>
+              <h3 className="text-2xl font-semibold text-white mb-4">Get Feedback</h3>
+              <p className="text-gray-400 text-lg">
+                Receive detailed analysis of your performance with personalized recommendations to improve your interview skills.
+              </p>
+            </motion.div>
+          </div>
+
+          {/* Call to Action */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1.6 }}
+            className="text-center mt-16"
+          >
+            <Button
+              asChild
+              className="bg-white text-black hover:bg-gray-200 font-semibold px-12 py-4 text-lg rounded-full"
+            >
+              <Link href="/interview">Start Your First Interview</Link>
+            </Button>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Resume Analyzer Section */}
+      <section className="relative py-20 px-4 overflow-hidden">
+        {/* Grid Pattern Background with Linear Gradient */}
+        <GridPattern
+          width={20}
+          height={20}
+          x={-1}
+          y={-1}
+          className={cn(
+            "absolute inset-0 [mask-image:linear-gradient(to_bottom_right,white,transparent,white)]",
+          )}
+        />
+        <div className="relative max-w-6xl mx-auto">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-5xl font-bold text-white mb-4">AI-Resume Analyzer</h2>
+            <p className="text-gray-400 text-xl max-w-2xl mx-auto">
+              Upload your resume and get comprehensive analysis with personalized recommendations
+            </p>
+          </motion.div>
+          
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <ResumeAnalyzer />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-5xl font-bold text-white mb-4">Choose Your Plan</h2>
+            <p className="text-gray-400 text-xl max-w-2xl mx-auto">
+              Start free, upgrade when you're ready to dominate
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Free Plan */}
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="p-8 border border-white rounded-xl bg-black relative"
+            >
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-semibold text-white mb-2">Free</h3>
+                <div className="text-4xl font-bold text-white mb-4">$0</div>
+                <p className="text-gray-400">Perfect for getting started</p>
+              </div>
+              
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  3 mock interviews per month
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Basic feedback analysis
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Resume analysis (1 per month)
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Standard question bank
+                </li>
+              </ul>
+              
+              <Button
+                asChild
+                className="w-full bg-white text-black hover:bg-gray-200 font-semibold py-3 rounded-lg"
+              >
+                <Link href="/sign-up">Get Started Free</Link>
+              </Button>
+            </motion.div>
+
+            {/* Pro Plan */}
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="p-8 border-2 border-white rounded-xl bg-black relative"
+            >
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <div className="bg-white text-black px-6 py-2 rounded-full text-sm font-semibold">
+                  Most Popular
+                </div>
+              </div>
+              
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-semibold text-white mb-2">Pro</h3>
+                <div className="text-4xl font-bold text-white mb-4">$19<span className="text-lg text-gray-400">/month</span></div>
+                <p className="text-gray-400">For serious job seekers</p>
+              </div>
+              
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Unlimited mock interviews
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Advanced AI feedback
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Unlimited resume analysis
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Industry-specific questions
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Performance tracking
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Priority support
+                </li>
+              </ul>
+              
+              <Button
+                asChild
+                className="w-full bg-white text-black hover:bg-gray-200 font-semibold py-3 rounded-lg"
+              >
+                <Link href="/sign-up">Start Pro Trial</Link>
+              </Button>
+            </motion.div>
+
+            {/* Enterprise Plan */}
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="p-8 border border-white rounded-xl bg-black relative"
+            >
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-semibold text-white mb-2">Enterprise</h3>
+                <div className="text-4xl font-bold text-white mb-4">Custom</div>
+                <p className="text-gray-400">For teams and organizations</p>
+              </div>
+              
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Everything in Pro
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Team management
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Custom integrations
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Analytics dashboard
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  Dedicated support
+                </li>
+                <li className="flex items-center text-gray-300">
+                  <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
+                  SLA guarantee
+                </li>
+              </ul>
+              
+              <Button
+                asChild
+                className="w-full bg-white text-black hover:bg-gray-200 font-semibold py-3 rounded-lg"
+              >
+                <Link href="/contact">Contact Sales</Link>
+              </Button>
+            </motion.div>
+          </div>
+
+          {/* Additional Info */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1.0 }}
+            className="text-center mt-16"
+          >
+            <p className="text-gray-400 text-lg mb-4">
+              All plans include a 7-day free trial. No credit card required.
+            </p>
+            <p className="text-gray-500 text-sm">
+              Cancel anytime • Upgrade or downgrade as needed
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Create Interview Button */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
@@ -332,29 +645,6 @@ const Page: React.FC<PageProps> = ({
 
       {/* ML + Python Backend Learning Path Section */}
       <MLPythonLearningPath />
-
-      {/* Resume Analyzer Section */}
-      <section className="mt-16">
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mb-8"
-        >
-          <h2 className="text-white text-2xl font-semibold mb-4">Resume Analyzer</h2>
-          <p className="text-light-100">
-            Upload your resume and get comprehensive analysis with personalized recommendations
-          </p>
-        </motion.div>
-        
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.8 }}
-        >
-          <ResumeAnalyzer />
-        </motion.div>
-      </section>
     </div>
   );
 };

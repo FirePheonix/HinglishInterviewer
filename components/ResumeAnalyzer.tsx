@@ -4,6 +4,8 @@ import React, { useState, useRef } from 'react';
 import { Upload, FileText, MessageCircle, BarChart3, Target, TrendingUp, CheckCircle, AlertCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { cn } from "@/lib/utils";
+import { GridPattern } from "@/components/magicui/grid-pattern";
 
 interface ResumeAnalysis {
   overallScore: number;
@@ -540,15 +542,20 @@ export default function ResumeAnalyzer() {
   );
 
   return (
-    <section className="py-12 bg-black text-white">
-      <div className="max-w-6xl mx-auto px-4">
+    <section className="relative py-12 bg-black text-white overflow-hidden">
+      {/* Grid Pattern Background */}
+      <GridPattern
+        width={30}
+        height={30}
+        x={-1}
+        y={-1}
+        strokeDasharray={"4 2"}
+        className={cn(
+          "absolute inset-0 [mask-image:radial-gradient(300px_circle_at_center,white,transparent)]",
+        )}
+      />
+      <div className="relative max-w-6xl mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-3">AI Resume Analyzer</h2>
-          <p className="text-light-100 text-lg">
-            Get comprehensive analysis and personalized recommendations for your resume
-          </p>
-        </div>
 
         {/* Navigation Tabs */}
         <div className="flex justify-center mb-6">
