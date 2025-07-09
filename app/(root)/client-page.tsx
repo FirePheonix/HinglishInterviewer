@@ -607,7 +607,7 @@ const Page: React.FC<PageProps> = ({
                     asChild
                     className="bg-white text-black hover:bg-gray-200 font-semibold px-8 py-3 rounded-full shadow-lg transition-all duration-300 group-hover:scale-110"
                   >
-                    <a href="https://https://notes-16q6.vercel.app" target="_blank" rel="noopener noreferrer">
+                    <a href="https://notes-16q6.vercel.app" target="_blank" rel="noopener noreferrer">
                       Try Now
                     </a>
                   </Button>
