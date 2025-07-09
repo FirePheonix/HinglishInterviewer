@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import InterviewCard from "@/components/InterviewCard";
 import ResumeAnalyzer from "@/components/ResumeAnalyzer";
+import DSALearningPath from "@/components/DSALearningPath";
+import DevelopmentLearningPath from "@/components/DevelopmentLearningPath";
+import MLPythonLearningPath from "@/components/MLPythonLearningPath";
 import { Brain, Mic, BarChart3 } from "lucide-react";
 
 interface PageProps {
@@ -134,6 +137,15 @@ const Page: React.FC<PageProps> = ({
           )}
         </div>
       </section>
+
+      {/* DSA Learning Path Section */}
+      <DSALearningPath />
+
+      {/* Development Learning Path Section */}
+      <DevelopmentLearningPath />
+
+      {/* ML + Python Backend Learning Path Section */}
+      <MLPythonLearningPath />
 
       {/* Resume Analyzer Section */}
       <section className="mt-16">
