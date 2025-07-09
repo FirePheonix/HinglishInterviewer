@@ -27,6 +27,13 @@ Deployed Link: https://notes-16q6.vercel.app
 Gitub: https://github.com/FirePheonix/expert-meet-guide
 Deployed Link: https://consultlo.netlify.app
 
+
+------------------------------
+# A revenue breakdown:
+
 ![image](https://github.com/user-attachments/assets/10f05720-3815-40d5-a87f-eef40f45b969)
 
-![image](https://github.com/user-attachments/assets/ef2dc901-3e30-4a0a-a1cc-3a01c6b876df)
+![image](https://github.com/user-attachments/assets/4da0d571-a834-44c4-80b6-95983e36f0de) 
+
+![image](https://github.com/user-attachments/assets/0607c81e-6b85-4969-b6c3-a1d15393a4bd)
+
