@@ -4,6 +4,7 @@ https://hinglish-interviewer.vercel.app
 
 -----------------------------------------------
 COMPLETE DEMO OF THE PROJECT: https://drive.google.com/file/d/1EvuUu_0rUd6df2_nYQIqr9OWRuRloMr8/view?usp=sharing
+(SKIP the part between 3:54 - 5:18) (skip that part, no audio, I have added everything correctly after that.)
 ------------------------------------------------
 
 
