@@ -62,6 +62,7 @@ interface AgentProps {
   phoneNumber?: string;
   profileImage?: string;
   mode?: "assistant" | "workflow";
+  onSetupComplete?: (data: any) => void;
 }
 
 interface RouteParams {

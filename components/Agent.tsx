@@ -39,6 +39,7 @@ const Agent = ({
   phoneNumber = "+1234567890", // Default phone number
   profileImage,
   mode = "assistant", // Default to assistant mode
+  onSetupComplete,
 }: AgentProps) => {
   const router = useRouter();
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
@@ -166,6 +167,44 @@ const Agent = ({
               "🔥 Final extracted variables:",
               message.extractedVariables
             );
+            
+            // If this is a setup workflow and we have a callback, generate interview automatically
+            if (onSetupComplete && type === "generate" && mode === "workflow") {
+              console.log("🔥 Auto-generating interview from workflow variables...");
+              
+              const extractedVars = message.extractedVariables;
+              const interviewData = {
+                type: extractedVars.type || "Technical",
+                role: extractedVars.role || "Software Engineer", 
+                level: extractedVars.level || "Mid",
+                techstack: extractedVars.techstack || "JavaScript,React,Node.js",
+                amount: parseInt(extractedVars.amount) || 5,
+                userid: userId,
+              };
+              
+              // Call the API to generate questions
+              fetch("/api/vapi/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(interviewData),
+              })
+              .then(response => response.json())
+              .then(result => {
+                if (result.success) {
+                  console.log("✅ Auto-generated interview questions:", result.questions);
+                  onSetupComplete({
+                    questions: result.questions,
+                    interviewId: result.interviewId,
+                    ...result
+                  });
+                } else {
+                  console.error("❌ Auto-generation failed:", result.message);
+                }
+              })
+              .catch(error => {
+                console.error("❌ Error in auto-generation:", error);
+              });
+            }
           }
         }
       };
@@ -366,8 +405,15 @@ const Agent = ({
             "✅ Interview questions generated successfully:",
             result.questions
           );
-          // Don't redirect immediately for generate type - let dialog handle success
-          if (type !== "generate") {
+          
+          // Call onSetupComplete callback if provided (for workflow setup)
+          if (onSetupComplete && type === "generate") {
+            onSetupComplete({
+              questions: result.questions,
+              interviewId: result.interviewId,
+              ...result
+            });
+          } else if (type !== "generate") {
             router.push("/");
           }
         } else {
@@ -624,16 +670,16 @@ const Agent = ({
     };
 
     if (callStatus === CallStatus.FINISHED) {
-      // For generate type, show dialog instead of auto-generating
+      // For generate type, always show dialog for manual input
       if (type === "generate") {
-        console.log("🟡 Showing interview setup dialog for generate type");
+        console.log("🟡 Showing interview setup dialog for generate type (workflow completed or ended early)");
         setShowInterviewDialog(true);
       } else {
         console.log("🟡 Auto-generating for non-generate type");
         handleGenerateFeedback(messages);
       }
     }
-  }, [messages, callStatus, feedbackId, interviewId, router, type, userId, mode, currentCallId]);
+  }, [messages, callStatus, feedbackId, interviewId, router, type, userId, mode, currentCallId, onSetupComplete]);
 
   const testVapiWorkflow = async () => {
     console.log("=== VAPI Workflow Test ===");
@@ -830,7 +876,7 @@ const Agent = ({
       console.log("Workflow call ended by user");
     }
 
-    // Show interview setup dialog for generate type
+    // Show interview setup dialog for generate type (always show for manual input)
     if (type === "generate") {
       setShowInterviewDialog(true);
     }
@@ -870,9 +916,20 @@ const Agent = ({
           "✅ Interview questions generated successfully:",
           result.questions
         );
-        // Close dialog only on success
-        setShowInterviewDialog(false);
-        router.push("/");
+        
+        // Call onSetupComplete callback if provided (for workflow setup)
+        if (onSetupComplete && type === "generate") {
+          onSetupComplete({
+            questions: result.questions,
+            interviewId: result.interviewId,
+            ...result
+          });
+          setShowInterviewDialog(false);
+        } else {
+          // Close dialog only on success
+          setShowInterviewDialog(false);
+          router.push("/");
+        }
       } else {
         console.error("❌ API returned success: false", result.message);
         // Keep dialog open and show error - user can retry or cancel
@@ -888,13 +945,87 @@ const Agent = ({
   };
 
   const InterviewSetupDialog = () => {
-    const [formData, setFormData] = useState<InterviewFormData>({
-      type: "Technical",
-      role: "Software Engineer",
-      level: "Mid",
-      techstack: "JavaScript,React,Node.js",
-      amount: 5,
-    });
+    // Extract data from messages if available, otherwise use defaults
+    const extractDataFromMessages = () => {
+      if (messages.length === 0) {
+        return {
+          type: "Technical",
+          role: "Software Engineer",
+          level: "Mid",
+          techstack: "JavaScript,React,Node.js",
+          amount: 5,
+        };
+      }
+
+      // Use the same extraction logic as in handleGenerateInterview
+      const conversationText = messages
+        .map((msg) => `${msg.role}: ${msg.content}`)
+        .join("\n")
+        .toLowerCase();
+
+      // Extract interview type
+      let type = "Technical";
+      if (conversationText.includes("behavioral")) {
+        type = "Behavioral";
+      } else if (conversationText.includes("mixed")) {
+        type = "Mixed";
+      }
+
+      // Extract role
+      let role = "Software Engineer";
+      const roleKeywords = {
+        frontend: "Frontend Developer",
+        "front-end": "Frontend Developer",
+        backend: "Backend Developer",
+        "back-end": "Backend Developer",
+        "full stack": "Full Stack Developer",
+        "data scientist": "Data Scientist",
+        "product manager": "Product Manager",
+        devops: "DevOps Engineer",
+        mobile: "Mobile Developer",
+      };
+
+      for (const [keyword, roleName] of Object.entries(roleKeywords)) {
+        if (conversationText.includes(keyword)) {
+          role = roleName;
+          break;
+        }
+      }
+
+      // Extract level
+      let level = "Mid";
+      if (conversationText.includes("junior")) {
+        level = "Junior";
+      } else if (conversationText.includes("senior")) {
+        level = "Senior";
+      }
+
+      // Extract tech stack
+      const techKeywords = [
+        "react", "angular", "vue", "javascript", "typescript", "python", 
+        "java", "node", "express", "mongodb", "mysql", "sql", "aws"
+      ];
+      const foundTech = techKeywords.filter((tech) =>
+        conversationText.includes(tech)
+      );
+      const techstack = foundTech.length > 0 ? foundTech.join(",") : "JavaScript,React,Node.js";
+
+      // Extract amount
+      let amount = 5;
+      const numberMatch = conversationText.match(/(\d+)\s*(questions?|interview)/);
+      if (numberMatch) {
+        const num = parseInt(numberMatch[1]);
+        if (num >= 3 && num <= 10) {
+          amount = num;
+        }
+      }
+
+      return { type, role, level, techstack, amount };
+    };
+
+    const [formData, setFormData] = useState<InterviewFormData>(() => 
+      extractDataFromMessages()
+    );
 
     const handleInputChange = (
       field: keyof InterviewFormData,
@@ -921,9 +1052,14 @@ const Agent = ({
     return (
       <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
         <div className="interview-dialog rounded-lg p-6 w-full max-w-md mx-4">
-          <h2 className="text-xl font-bold mb-4">
+          <h2 className="text-xl font-bold mb-2">
             Setup Your Interview
           </h2>
+          {messages.length > 0 && (
+            <p className="text-sm text-gray-400 mb-4">
+              ✨ Form pre-filled based on your conversation
+            </p>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Interview Type */}

@@ -11,10 +11,129 @@ import ResumeAnalyzer from "@/components/ResumeAnalyzer";
 import DSALearningPath from "@/components/DSALearningPath";
 import DevelopmentLearningPath from "@/components/DevelopmentLearningPath";
 import MLPythonLearningPath from "@/components/MLPythonLearningPath";
-import { Brain, Mic, BarChart3 } from "lucide-react";
+import { Brain, Mic, BarChart3, Play, Pause } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DotPattern } from "@/components/magicui/dot-pattern";
 import { GridPattern } from "@/components/magicui/grid-pattern";
+
+// Audio files arrays
+const englishVoiceMemes = [
+  "/english-voice/Voicy_Your actions have consequences (Download MP3).mp3",
+  "/english-voice/Voicy_we do not care.mp3",
+  "/english-voice/Voicy_Sad Violin.mp3",
+  "/english-voice/Voicy_Michael Jordan_ Stop It, Get Some Help.mp3",
+  "/english-voice/Voicy_Hey, that's pretty good!.mp3",
+  "/english-voice/Voicy_FBI OPEN UP!.mp3",
+  "/english-voice/Voicy_Emotional Damage.mp3",
+  "/english-voice/Voicy_Ayo the pizza's here.mp3",
+  "/english-voice/Voicy_Ah! I see you're a man of culture as well.mp3",
+  "/english-voice/Voicy_69 - nice.mp3",
+  "/english-voice/John Cena Bing Chilling.mp3",
+  "/english-voice/I Like Ya Cut G.mp3",
+  "/english-voice/Bruh Sound Effect #2.mp3",
+  "/english-voice/Bonk.mp3",
+  "/english-voice/Big Chungus.mp3",
+  "/english-voice/Among Us Role Reveal Sound.mp3"
+];
+
+const hindiVoiceMemes = [
+  "/hindi-voice/Voicy_Ye Karke Dikhao.mp3",
+  "/hindi-voice/Voicy_Tareekh par tareekh.mp3",
+  "/hindi-voice/Voicy_So Beatiful.mp3",
+  "/hindi-voice/Voicy_Rishte mein to hum tumhare baap hote hain.mp3",
+  "/hindi-voice/Voicy_Rahul Gandhi aloo sona machine.mp3",
+  "/hindi-voice/Voicy_Padhaai Likhaai me dhyan do.mp3",
+  "/hindi-voice/Voicy_Mere pas maa hai.mp3",
+  "/hindi-voice/Voicy_Matlab Kuch bhi.mp3",
+  "/hindi-voice/Voicy_khatam goodbye.mp3",
+  "/hindi-voice/Voicy_He Prabhu.mp3",
+  "/hindi-voice/Voicy_Control Uday control.mp3",
+  "/hindi-voice/Voicy_Bolo Zubaan Kesari.mp3",
+  "/hindi-voice/Voicy_Bhagwan ka diya sab kuch hai.mp3",
+  "/hindi-voice/Voicy_Are kehna kya chahte ho.mp3",
+  "/hindi-voice/Voicy_Abhi Maja ayega na Bhidu.mp3"
+];
+
+// Audio Player Component
+const VoiceMemePlayer = ({ audioFiles, side, label }: {
+  audioFiles: string[];
+  side: 'left' | 'right';
+  label: string;
+}) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
+
+  const playRandomMeme = () => {
+    if (isPlaying && currentAudio) {
+      // Stop current audio
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      setIsPlaying(false);
+      setCurrentAudio(null);
+      return;
+    }
+
+    // Play random audio
+    const randomIndex = Math.floor(Math.random() * audioFiles.length);
+    const audio = new Audio(audioFiles[randomIndex]);
+    
+    audio.onloadeddata = () => {
+      audio.play();
+      setIsPlaying(true);
+      setCurrentAudio(audio);
+    };
+
+    audio.onended = () => {
+      setIsPlaying(false);
+      setCurrentAudio(null);
+    };
+
+    audio.onerror = () => {
+      setIsPlaying(false);
+      setCurrentAudio(null);
+    };
+  };
+
+  return (
+    <motion.div
+      className={`absolute top-1/2 transform -translate-y-1/2 z-30 ${
+        side === 'left' ? 'left-[15%]' : 'right-[15%]'
+      }`}
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ delay: 0.8, duration: 0.5 }}
+    >
+      <motion.button
+        onClick={playRandomMeme}
+        className={`group relative w-16 h-16 rounded-full border-2 border-white bg-black/80 backdrop-blur-sm flex items-center justify-center transition-all duration-300 hover:scale-110 ${
+          isPlaying 
+            ? 'border-green-400 bg-green-400/20 shadow-[0_0_20px_rgba(34,197,94,0.4)]' 
+            : 'hover:border-blue-400 hover:bg-blue-400/20 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)]'
+        }`}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        {isPlaying ? (
+          <Pause className="w-6 h-6 text-white" />
+        ) : (
+          <Play className="w-6 h-6 text-white ml-0.5" />
+        )}
+        
+        {/* Label */}
+        <div className={`absolute ${
+          side === 'left' ? '-bottom-8 left-1/2 transform -translate-x-1/2' : '-bottom-8 left-1/2 transform -translate-x-1/2'
+        } text-xs text-gray-400 font-medium whitespace-nowrap`}>
+          {label}
+        </div>
+
+        {/* Pulse animation when playing */}
+        {isPlaying && (
+          <div className="absolute inset-0 rounded-full border-2 border-green-400 animate-ping opacity-75"></div>
+        )}
+      </motion.button>
+    </motion.div>
+  );
+};
 
 const HowItWorksCard = ({ stepNumber, title, description, delay, icon, hoverColor }: {
   stepNumber: string;
@@ -23,7 +142,7 @@ const HowItWorksCard = ({ stepNumber, title, description, delay, icon, hoverColo
   delay: number;
   icon: string;
   hoverColor: string;
-  
+
 }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -216,13 +335,14 @@ const ResumeAnalyzerInView = () => {
   );
 };
 
-const ProductBannerInView = ({ src, alt, href, buttonText, delay, hoverColor }: {
+const ProductBannerInView = ({ src, alt, href, buttonText, delay, hoverColor, isFullWidth = false }: {
   src: string;
   alt: string;
   href: string;
   buttonText: string;
   delay: number;
   hoverColor: string;
+  isFullWidth?: boolean;
 }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -257,6 +377,9 @@ const ProductBannerInView = ({ src, alt, href, buttonText, delay, hoverColor }: 
     }
   };
 
+  // Check if href is internal (starts with /) or external
+  const isInternalLink = href.startsWith('/');
+
   return (
     <motion.div
       ref={ref}
@@ -270,7 +393,7 @@ const ProductBannerInView = ({ src, alt, href, buttonText, delay, hoverColor }: 
       }}
       className="relative group cursor-pointer"
     >
-      <div className={`relative overflow-hidden rounded-xl border border-white bg-black h-[400px] ${getBorderHoverClass()} transition-all duration-500`}>
+      <div className={`relative overflow-hidden rounded-xl border border-white bg-black ${isFullWidth ? 'h-[300px]' : 'h-[400px]'} ${getBorderHoverClass()} transition-all duration-500`}>
         <motion.img 
           src={src}
           alt={alt}
@@ -279,16 +402,22 @@ const ProductBannerInView = ({ src, alt, href, buttonText, delay, hoverColor }: 
         />
         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/5 transition-all duration-500"></div>
         
-        {/* Try Now Button Overlay */}
+        {/* Button Overlay */}
         <div className="absolute bottom-8 right-8">
           <motion.div whileHover={{ scale: 1.15, rotate: getHoverDirection() }} whileTap={{ scale: 0.95 }}>
             <Button
               asChild
               className={`bg-white text-black ${getButtonHoverClass()} hover:text-white font-semibold px-8 py-3 rounded-full shadow-lg transition-all duration-300 group-hover:shadow-2xl`}
             >
-              <a href={href} target="_blank" rel="noopener noreferrer">
-                {buttonText}
-              </a>
+              {isInternalLink ? (
+                <Link href={href}>
+                  {buttonText}
+                </Link>
+              ) : (
+                <a href={href} target="_blank" rel="noopener noreferrer">
+                  {buttonText}
+                </a>
+              )}
             </Button>
           </motion.div>
         </div>
@@ -525,7 +654,15 @@ const Page: React.FC<PageProps> = ({
             Next Interview
           </h1>
           
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-8 relative">
+            {/* English Voice Meme Player - Left Side */}
+            <VoiceMemePlayer
+              audioFiles={englishVoiceMemes}
+              side="left"
+              label="English-Memes"
+            />
+
+            {/* Brain SVG */}
             <motion.div 
               className="w-32 h-32 bg-black rounded-full flex items-center justify-center border-2 border-gray-700 cursor-pointer"
               whileHover={{ 
@@ -541,6 +678,13 @@ const Page: React.FC<PageProps> = ({
             >
               <Brain className="w-16 h-16 text-white" />
             </motion.div>
+
+            {/* Hindi Voice Meme Player - Right Side */}
+            <VoiceMemePlayer
+              audioFiles={hindiVoiceMemes}
+              side="right"
+              label="Hindi-Memes"
+            />
           </div>
           
           <p className="text-gray-400 text-xl mb-4">
@@ -548,7 +692,7 @@ const Page: React.FC<PageProps> = ({
           </p>
           
           <h2 className="text-3xl font-bold text-white mb-8">
-            Prep Loud. Land Proud.
+            Tailored For Indian Audience
           </h2>
           
           <Button
@@ -758,6 +902,8 @@ const Page: React.FC<PageProps> = ({
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-8">
+          
+
             <ProductBannerInView
               src="/NotesLoBanner.png"
               alt="Notesलो - AI Coding Notetaker"
@@ -777,6 +923,15 @@ const Page: React.FC<PageProps> = ({
             />
 
             <ProductBannerInView
+              src="/JobLoBanner.png"
+              alt="Jobलो - AI Job Search Platform"
+              href="https://job-lo.vercel.app"
+              buttonText="Try Now"
+              delay={0.8}
+              hoverColor="orange"
+            />
+
+            <ProductBannerInView
               src="/ConsultLoBanner.png"
               alt="Consultलो - AI Consultation Platform"
               href="https://consultlo.netlify.app/"
@@ -785,24 +940,23 @@ const Page: React.FC<PageProps> = ({
               hoverColor="green"
             />
 
-            <ProductBannerInView
-              src="/JobLoBanner.png"
-              alt="Jobलो - AI Job Search Platform"
-              href="https://job-lo.vercel.app"
-              buttonText="Try Now"
-              delay={0.8}
-              hoverColor="orange"
-            />
+              {/* InterviewLo Banner - Spans full width (2 columns) */}
+            <div className="md:col-span-2">
+              <ProductBannerInView
+                src="/InterviewLoBanner.jpg"
+                alt="InterviewLo - AI Mock Interview Platform"
+                href="/interview"
+                buttonText="Create Interview"
+                delay={0.1}
+                hoverColor="blue"
+                isFullWidth={true}
+              />
+            </div>
+
+            
           </div>
         </div>
       </section>
-
-      {/* Create Interview Button */}
-      <CallToActionButton 
-        href="/interview"
-        text="Create Interview"
-        delay={0.2}
-      />
 
       {/* Your Interviews Section */}
       <section className="flex flex-col gap-6 mt-8">
@@ -832,8 +986,6 @@ const Page: React.FC<PageProps> = ({
 
       {/* Take an Interview Section */}
       <section className="flex flex-col gap-6 mt-8">
-        <h2 className="text-white text-2xl font-semibold">Take an Interview</h2>
-
         <div className="interviews-section">
           {hasUpcomingInterviews ? (
             latestInterviews?.map((interview) => (
@@ -850,7 +1002,6 @@ const Page: React.FC<PageProps> = ({
             ))
           ) : (
             <p className="text-light-100">
-              There are no new interviews available
             </p>
           )}
         </div>
