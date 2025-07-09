@@ -23,6 +23,7 @@ const HowItWorksCard = ({ stepNumber, title, description, delay, icon, hoverColo
   delay: number;
   icon: string;
   hoverColor: string;
+  
 }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
