@@ -750,7 +750,7 @@ const Page: React.FC<PageProps> = ({
           >
             <h2 className="text-5xl font-bold text-white mb-4">Our Products</h2>
             <p className="text-gray-400 text-xl max-w-2xl mx-auto">
-              Discover our suite of AI-powered tools designed to accelerate your coding journey
+              Discover our suite of AI-powered tools designed to accelerate your coding journey.
             </p>
           </motion.div>
 
