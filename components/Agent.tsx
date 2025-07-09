@@ -36,9 +36,8 @@ const Agent = ({
   feedbackId,
   type,
   questions,
-  phoneNumber = "+1234567890", // Default phone number
   profileImage,
-  mode = "assistant", // Default to assistant mode
+  mode = "assistant",
   onSetupComplete,
 }: AgentProps) => {
   const router = useRouter();
@@ -120,10 +119,6 @@ const Agent = ({
       };
 
       const onMessage = (message: any) => {
-        console.log("🔥 VAPI message received:", message);
-        console.log("🔥 Message type:", message.type);
-        console.log("🔥 Message keys:", Object.keys(message));
-
         if (
           message.type === "transcript" &&
           message.transcriptType === "final"
@@ -132,15 +127,7 @@ const Agent = ({
             role: message.role,
             content: message.transcript,
           };
-          setMessages((prev) => {
-            const updated = [...prev, newMessage];
-            console.log("🔥 Messages updated, new count:", updated.length);
-            console.log("🔥 Latest message:", newMessage);
-            return updated;
-          });
-          console.log("🔥 New message added to state:", newMessage);
-        } else if (message.type === "transcript") {
-          console.log("🔥 Partial transcript:", message.transcript);
+          setMessages((prev) => [...prev, newMessage]);
         }
 
         // Handle workflow variable extraction
@@ -148,11 +135,9 @@ const Agent = ({
           message.type === "workflow-variable-extraction" ||
           message.type === "variable-extraction"
         ) {
-          console.log("🔥 Variable extraction message:", message);
           // Store the extracted variables for later use
           if (message.variables) {
-            console.log("🔥 Extracted variables:", message.variables);
-            // Store in component state or handle immediately
+            console.log("Variables extracted:", message.variables);
           }
         }
 
@@ -161,17 +146,11 @@ const Agent = ({
           message.type === "workflow-completed" ||
           message.type === "workflow-finished"
         ) {
-          console.log("🔥 Workflow completed message:", message);
           if (message.extractedVariables) {
-            console.log(
-              "🔥 Final extracted variables:",
-              message.extractedVariables
-            );
+            console.log("Workflow completed with variables:", message.extractedVariables);
             
             // If this is a setup workflow and we have a callback, generate interview automatically
             if (onSetupComplete && type === "generate" && mode === "workflow") {
-              console.log("🔥 Auto-generating interview from workflow variables...");
-              
               const extractedVars = message.extractedVariables;
               const interviewData = {
                 type: extractedVars.type || "Technical",
@@ -191,18 +170,17 @@ const Agent = ({
               .then(response => response.json())
               .then(result => {
                 if (result.success) {
-                  console.log("✅ Auto-generated interview questions:", result.questions);
                   onSetupComplete({
                     questions: result.questions,
                     interviewId: result.interviewId,
                     ...result
                   });
                 } else {
-                  console.error("❌ Auto-generation failed:", result.message);
+                  console.error("Auto-generation failed:", result.message);
                 }
               })
               .catch(error => {
-                console.error("❌ Error in auto-generation:", error);
+                console.error("Error in auto-generation:", error);
               });
             }
           }
@@ -240,9 +218,6 @@ const Agent = ({
         vapi.off("error", onError);
       };
     }
-
-    console.log(`Agent initialized for ${mode} mode`);
-    console.log("Type:", type, "User:", userName, "UserID:", userId);
   }, [mode, type, userName, userId]);
 
   useEffect(() => {
@@ -269,24 +244,12 @@ const Agent = ({
     };
 
     const handleGenerateInterview = async () => {
-      console.log("🚀 handleGenerateInterview - Starting interview generation");
-      console.log("🚀 Messages for extraction:", messages);
-      console.log("🚀 Messages count:", messages.length);
-      console.log("🚀 Current mode:", mode);
-      console.log("🚀 Current call ID:", currentCallId);
-
-      // Debug each message
-      messages.forEach((msg, index) => {
-        console.log(`🚀 Message ${index}:`, msg);
-      });
-
       // For workflow mode, we should get the extracted variables from the call
       // For assistant mode, we extract from the conversation transcript
       let interviewData;
 
       if (mode === "workflow" && currentCallId) {
         // Get the call data which should contain extracted variables
-        console.log("Fetching call data for extracted variables...");
         try {
           const response = await fetch(
             `/api/vapi/call-status?callId=${currentCallId}`
@@ -294,15 +257,10 @@ const Agent = ({
           const { success, call } = await response.json();
 
           if (success && call) {
-            console.log("Call data received:", call);
-
             let extractedVariables = call.extractedVariables;
 
             // If no extracted variables, try to extract from transcript
             if (!extractedVariables && call.transcript) {
-              console.log(
-                "No extracted variables found, parsing transcript..."
-              );
               extractedVariables = parseTranscriptForVariables(call.transcript);
             }
 
@@ -310,8 +268,6 @@ const Agent = ({
               extractedVariables &&
               Object.keys(extractedVariables).length > 0
             ) {
-              console.log("Using extracted variables:", extractedVariables);
-
               // Use the extracted variables from the workflow
               interviewData = {
                 type: extractedVariables.type || "Technical",
@@ -322,15 +278,10 @@ const Agent = ({
                 amount: parseInt(extractedVariables.amount) || 5,
               };
             } else {
-              console.warn("No variables found in call data or transcript");
               // Try to extract from local messages as fallback
               if (messages.length > 0) {
-                console.log("Attempting to extract from local messages...");
                 interviewData = extractFromTranscript();
               } else {
-                console.warn(
-                  "Using default values - no conversation data available"
-                );
                 interviewData = {
                   type: "Technical",
                   role: "Software Engineer",
@@ -352,30 +303,18 @@ const Agent = ({
         }
       } else {
         // Assistant mode - extract from conversation transcript
-        console.log(
-          "Extracting from conversation transcript (assistant mode)..."
-        );
         interviewData = extractFromTranscript();
       }
-
-      console.log("Final interview data:", interviewData);
 
       // Validate required data
       if (!userId) {
         console.error("Missing userId for interview generation");
-        // Don't redirect immediately for generate type - show dialog instead
         if (type === "generate") {
-          console.log("Showing dialog for missing userId scenario");
           return; // Let the dialog handle this
         }
         router.push("/");
         return;
       }
-
-      console.log("Sending interview data to API:", {
-        ...interviewData,
-        userid: userId,
-      });
 
       try {
         const response = await fetch("/api/vapi/generate", {
@@ -389,8 +328,6 @@ const Agent = ({
           }),
         });
 
-        console.log("API response status:", response.status);
-
         if (!response.ok) {
           const errorText = await response.text();
           console.error("API error response:", errorText);
@@ -398,14 +335,8 @@ const Agent = ({
         }
 
         const result = await response.json();
-        console.log("API response data:", result);
 
         if (result.success) {
-          console.log(
-            "✅ Interview questions generated successfully:",
-            result.questions
-          );
-          
           // Call onSetupComplete callback if provided (for workflow setup)
           if (onSetupComplete && type === "generate") {
             onSetupComplete({
@@ -417,15 +348,13 @@ const Agent = ({
             router.push("/");
           }
         } else {
-          console.error("❌ API returned success: false", result.message);
-          // Don't redirect immediately for generate type - let dialog handle error
+          console.error("API returned success: false", result.message);
           if (type !== "generate") {
             router.push("/");
           }
         }
       } catch (error) {
-        console.error("❌ Error generating interview:", error);
-        // Don't redirect immediately for generate type - let dialog handle error
+        console.error("Error generating interview:", error);
         if (type !== "generate") {
           router.push("/");
         }
@@ -561,7 +490,6 @@ const Agent = ({
       for (const [keyword, roleName] of Object.entries(roleKeywords)) {
         if (conversationText.includes(keyword)) {
           role = roleName;
-          console.log(`Found role keyword '${keyword}' -> '${roleName}'`);
           break;
         }
       }
@@ -658,7 +586,6 @@ const Agent = ({
 
           if (num >= 3 && num <= 10) {
             amount = num;
-            console.log(`Found question count: ${amount}`);
             break;
           }
         }
@@ -672,86 +599,15 @@ const Agent = ({
     if (callStatus === CallStatus.FINISHED) {
       // For generate type, always show dialog for manual input
       if (type === "generate") {
-        console.log("🟡 Showing interview setup dialog for generate type (workflow completed or ended early)");
         setShowInterviewDialog(true);
       } else {
-        console.log("🟡 Auto-generating for non-generate type");
         handleGenerateFeedback(messages);
       }
     }
   }, [messages, callStatus, feedbackId, interviewId, router, type, userId, mode, currentCallId, onSetupComplete]);
 
-  const testVapiWorkflow = async () => {
-    console.log("=== VAPI Workflow Test ===");
-
-    try {
-      // Test connection
-      const connectionTest = await fetch("/api/vapi/debug", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "test-connection" }),
-      });
-      const connectionResult = await connectionTest.json();
-      console.log("Connection test:", connectionResult);
-
-      // Test workflow creation
-      const workflowTest = await fetch("/api/vapi/debug", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "test-workflow-creation" }),
-      });
-      const workflowResult = await workflowTest.json();
-      console.log("Workflow creation test:", workflowResult);
-
-      // List existing workflows
-      const listTest = await fetch("/api/vapi/debug", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "list-workflows" }),
-      });
-      const listResult = await listTest.json();
-      console.log("List workflows test:", listResult);
-    } catch (error) {
-      console.error("Test error:", error);
-    }
-  };
-
-  const testVapiClient = () => {
-    console.log("=== VAPI Client Test ===");
-    const client = createVapiClient();
-
-    if (!client) {
-      console.error("❌ VAPI client creation failed");
-      return;
-    }
-
-    console.log("✅ VAPI client created successfully");
-    console.log("Client instance:", client);
-
-    // Test if the client has the expected methods
-    console.log("Available methods:", {
-      start: typeof client.start,
-      stop: typeof client.stop,
-      on: typeof client.on,
-      off: typeof client.off,
-    });
-  };
-
   const handleCall = async () => {
     setCallStatus(CallStatus.CONNECTING);
-
-    // Debug environment variables
-    console.log("Environment check:");
-    console.log(
-      "- VAPI Token available:",
-      !!process.env.NEXT_PUBLIC_VAPI_WEB_TOKEN
-    );
-    console.log(
-      "- Workflow ID available:",
-      !!process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID
-    );
-    console.log("- Mode:", mode);
-    console.log("- Type:", type);
 
     try {
       if (mode === "workflow") {
@@ -768,13 +624,7 @@ const Agent = ({
   };
 
   const handleWorkflowCall = async () => {
-    console.log("=== Starting Workflow Mode ===");
-
     if (type === "generate") {
-      // Use the VAPI Web SDK directly with setup assistant
-      // This approach works for both localhost and production
-      console.log("Starting interview setup using VAPI Web SDK...");
-
       const vapi = createVapiClient();
 
       if (!vapi) {
@@ -784,8 +634,6 @@ const Agent = ({
       }
 
       try {
-        // Use the setup assistant from constants for data collection
-        console.log("Starting VAPI call with setup assistant");
         await vapi.start(setupAssistant, {
           variableValues: {
             username: userName,
@@ -793,7 +641,6 @@ const Agent = ({
           },
         });
 
-        console.log("Setup assistant started successfully");
         setCallStatus(CallStatus.ACTIVE);
       } catch (error) {
         console.error("Failed to start setup assistant:", error);
@@ -801,7 +648,6 @@ const Agent = ({
       }
     } else {
       // For interview mode, use the interviewer assistant
-      console.log("Starting interview mode...");
       await handleAssistantCall();
     }
   };
@@ -819,18 +665,6 @@ const Agent = ({
 
     try {
       if (type === "generate") {
-        const workflowId = process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID;
-        if (workflowId) {
-          console.warn(
-            "Workflow ID found but assistant mode doesn't support workflow IDs directly. Using interviewer assistant instead."
-          );
-        }
-
-        console.log(
-          "Starting VAPI call with interviewer assistant for data collection"
-        );
-
-        // For now, use the interviewer with variable values to customize behavior
         await vapi.start(interviewer, {
           variableValues: {
             username: userName,
@@ -846,7 +680,6 @@ const Agent = ({
             .join("\n");
         }
 
-        console.log("Starting VAPI call with assistant config");
         await vapi.start(interviewer, {
           variableValues: {
             questions: formattedQuestions,
@@ -884,9 +717,6 @@ const Agent = ({
 
   const handleInterviewFormSubmit = async (formData: InterviewFormData) => {
     setIsGeneratingInterview(true);
-    // Don't close dialog immediately - keep it open to show loading state
-
-    console.log("🚀 Manual interview generation with form data:", formData);
 
     try {
       const response = await fetch("/api/vapi/generate", {
@@ -896,11 +726,9 @@ const Agent = ({
         },
         body: JSON.stringify({
           ...formData,
-          userid: userId, // Auto-include Firebase user ID
+          userid: userId,
         }),
       });
-
-      console.log("API response status:", response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -909,14 +737,8 @@ const Agent = ({
       }
 
       const result = await response.json();
-      console.log("API response data:", result);
 
       if (result.success) {
-        console.log(
-          "✅ Interview questions generated successfully:",
-          result.questions
-        );
-        
         // Call onSetupComplete callback if provided (for workflow setup)
         if (onSetupComplete && type === "generate") {
           onSetupComplete({
@@ -926,19 +748,15 @@ const Agent = ({
           });
           setShowInterviewDialog(false);
         } else {
-          // Close dialog only on success
           setShowInterviewDialog(false);
           router.push("/");
         }
       } else {
-        console.error("❌ API returned success: false", result.message);
-        // Keep dialog open and show error - user can retry or cancel
+        console.error("API returned success: false", result.message);
         throw new Error(result.message || "Unknown error");
       }
     } catch (error) {
-      console.error("❌ Error generating interview:", error);
-      // Keep dialog open on error - don't close it
-      // The error will be shown in the dialog
+      console.error("Error generating interview:", error);
     } finally {
       setIsGeneratingInterview(false);
     }
@@ -1314,31 +1132,6 @@ const Agent = ({
                   : "Connecting..."}
               </span>
             </button>
-
-            {mode === "assistant" && (
-              <>
-                <button
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm"
-                  onClick={testVapiClient}
-                >
-                  Test VAPI Client
-                </button>
-                <button
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
-                  onClick={testVapiWorkflow}
-                >
-                  Test Workflow
-                </button>
-              </>
-            )}
-            {mode === "workflow" && (
-              <button
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
-                onClick={testVapiWorkflow}
-              >
-                Debug Workflow
-              </button>
-            )}
           </>
         ) : !isGeneratingInterview ? (
           <button className="btn-disconnect" onClick={() => handleDisconnect()}>
